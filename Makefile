@@ -2,6 +2,7 @@ obj-m := anansi.o
 anansi-objs += anansi_module.o
 anansi-objs += anansi_msr.o
 anansi-objs += anansi_hwsupp.o
+anansi-objs += anansi_context.o
 anansi-objs += anansi_transition.o
 
 all:
@@ -9,3 +10,6 @@ all:
 
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+
+$(KBUILD_EXTMOD)/anansi_context.o: anansi_context.asm
+	nasm -f elf64 $< -o $@
