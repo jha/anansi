@@ -10,6 +10,9 @@
 #define IA32_FTR_CTRL_MSR_VMXSMX    (1 << 1)
 #define IA32_FTR_CTRL_MSR_VMXOSMX   (1 << 2)
 
+#define IA32_VMX_BASIC_MSR          0x480
+#define IA32_VMX_BASIC_MSR_REV      0xFFFFFFFF
+
 inline uint64_t
 anansi_msr_read(unsigned int msr);
 

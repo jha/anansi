@@ -1,5 +1,6 @@
 obj-m := anansi.o
 anansi-objs += anansi_module.o
+anansi-objs += anansi_com.o
 anansi-objs += anansi_msr.o
 anansi-objs += anansi_hwsupp.o
 anansi-objs += anansi_context.o

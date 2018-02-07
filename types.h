@@ -12,4 +12,8 @@ typedef enum {
 #define MODULE_EXIT_SUCCESS 0
 #define MODULE_EXIT_FAILURE 1
 
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 4096
+#endif
+
 #endif /* TYPES_H */

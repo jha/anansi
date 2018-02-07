@@ -2,7 +2,9 @@
 
 #include "anansi_transition.h"
 #include "anansi_hwsupp.h"
+#include "anansi_vcore.h"
 #include "anansi_context.h"
+#include "anansi_flags.h"
 
 bool_t
 anansi_transition_enable_cr4(void)
@@ -29,25 +31,32 @@ anansi_transition_disable_cr4(void)
 }
 
 bool_t
-anansi_transition_hyperjack(bool_t *success)
+anansi_transition_hyperjack(bool_t *success, struct anansi_vcore *vcore)
 {
+
     return FALSE;
 }
 
-bool_t __attribute__((optimize ("O0")))
-anansi_transition_enter(void)
+void __attribute__((optimize ("O0")))
+anansi_transition_enter(void *arg)
 {
-    struct anansi_context context;
+    struct anansi_vcore *vcore;
     bool_t hv_present;
 
     if (anansi_hwsupp() == FALSE)
-        return FALSE;
+        return;
 
     if (anansi_transition_enable_cr4() == FALSE)
-        return FALSE;
+        return;
+
+    vcore = anansi_vcore_init();
+    if (vcore == NULL) {
+        anansi_transition_disable_cr4();
+        return;
+    }
 
     hv_present = FALSE;
-    anansi_context_capture(&context);
+    anansi_context_capture(&vcore->stack.layout.args.pre_launch_ctx);
 
     /* If hv_present is FALSE, then we never hypervised. After we
      * virtualize the system, we will restore all registers to our
@@ -57,10 +66,12 @@ anansi_transition_enter(void)
      *
      * This is also the reason the function is marked as O0, to
      * prevent the compiler from optimizing this branch away */
-    if (hv_present == FALSE)
-        anansi_transition_hyperjack(&hv_present);
-
-    return TRUE;
+    if (hv_present == FALSE) {
+        if (anansi_transition_hyperjack(&hv_present, vcore) == FALSE) {
+            anansi_transition_disable_cr4();
+            return;
+        }
+    }
 }
 
 bool_t
@@ -69,11 +80,9 @@ anansi_transition_unhyperjack(void)
     return FALSE;
 }
 
-bool_t
-anansi_transition_exit(void)
+void
+anansi_transition_exit(void *arg)
 {
     if (anansi_transition_disable_cr4() == FALSE)
-        return FALSE;
-
-    return TRUE;
+        return;
 }

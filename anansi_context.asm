@@ -18,7 +18,7 @@ struc context
 ; will be passed on registers. The context struc will clobber the
 ; previous value of rdi, so there is no point saving it
 
-; Additional GPRs */
+; Additional GPRs
 .r8:    RESQ 1
 .r9:    RESQ 1
 .r10:   RESQ 1
@@ -27,6 +27,9 @@ struc context
 .r13:   RESQ 1
 .r14:   RESQ 1
 .r15:   RESQ 1
+
+; Instruction pointer
+.rip:   RESQ 1
 
 ; TODO: Add SIMD registers too
 endstruc
@@ -53,6 +56,14 @@ anansi_context_capture:
     mov     qword [rdi + context.r14], r14
     mov     qword [rdi + context.r15], r15
 
+    ; Capture the instruction pointer in the context of the caller
+    ; Since we have no function epilogue, the return address should be
+    ; at the top of the stack
+    push    rax
+    mov     rax, qword [rsp + 8]
+    mov     qword [rdi + context.rip], rax
+    pop     rax
+
     ret
 
 ; context struc as arg0 (passed in rdi)
@@ -76,10 +87,5 @@ anansi_context_restore:
     mov     r13, qword [rdi + context.r13]
     mov     r14, qword [rdi + context.r14]
     mov     r15, qword [rdi + context.r15]
-
-    ; It's highly unlikely, but we don't want to leak the
-    ; address of our context structure through the rdi register
-    ; so we will overwrite it here before we return
-    mov     rdi, 0
 
     ret

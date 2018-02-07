@@ -1,5 +1,6 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/smp.h>
 
 #include "types.h"
 #include "anansi_transition.h"
@@ -9,10 +10,11 @@ anansi_init(void)
 {
     LOG("initializing...");
 
-    if (anansi_transition_enter() == FALSE) {
-        LOG("Failed to transition to virtualized state");
-        return MODULE_EXIT_FAILURE;
-    }
+#if 1 /* Run on first CPU only */
+    smp_call_function_single(0, anansi_transition_enter, NULL, 1);
+#else /* Run on all CPUs */
+    on_each_cpu(anansi_transition_enter, NULL, 1);
+#endif
 
     LOG("Finished!");
     return MODULE_EXIT_SUCCESS;
@@ -21,8 +23,11 @@ anansi_init(void)
 void __exit
 anansi_exit(void)
 {
-    if (anansi_transition_exit() == FALSE)
-        LOG("Failed to take CPU out of virtualized state");
+#if 1 /* Run on first CPU only */
+    smp_call_function_single(0, anansi_transition_exit, NULL, 1);
+#else /* Run on all CPUs */
+    on_each_cpu(anansi_transition_exit, NULL, 1);
+#endif
 }
 
 module_init(anansi_init);
