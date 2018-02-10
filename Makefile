@@ -4,6 +4,9 @@ anansi-objs += anansi_com.o
 anansi-objs += anansi_msr.o
 anansi-objs += anansi_hwsupp.o
 anansi-objs += anansi_context.o
+anansi-objs += anansi_vcore.o
+anansi-objs += anansi_flags.o
+anansi-objs += anansi_vmx.o
 anansi-objs += anansi_transition.o
 
 all:

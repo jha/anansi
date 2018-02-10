@@ -16,14 +16,16 @@ anansi_vcore_init(void)
         return NULL;
     }
 
-    vcore = kmalloc(GFP_KERNEL, sizeof (struct anansi_vcore));
+    /* I think we are running as an interrupt, so we need to call kmalloc
+     * with GFP_ATOMIC to prevent it from blocking. Needs more research */
+    vcore = kmalloc(GFP_ATOMIC, sizeof (struct anansi_vcore));
     if (vcore == NULL) {
         LOG("Not enough kernel memory to allocate vcore data");
         return NULL;
     }
     memset(vcore, 0, sizeof (struct anansi_vcore));
-    vcore->stack.layout.args.vmxon_phyaddr = virt_to_phys(vcore->vmxon);
-    vcore->stack.layout.args.vmcs_phyaddr = virt_to_phys(vcore->vmcs);
+    vcore->stack.layout.args.vmxon_phaddr = virt_to_phys(vcore->vmxon);
+    vcore->stack.layout.args.vmcs_phaddr = virt_to_phys(vcore->vmcs);
 
     *((uint32_t *)vcore->vmxon) = revision_id;
     *((uint32_t *)vcore->vmcs) = revision_id;

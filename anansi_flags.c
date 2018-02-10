@@ -1,6 +1,6 @@
 #include "anansi_flags.h"
 
-uint64_t
+uint32_t
 anansi_flags(void)
 {
     uint64_t flags;

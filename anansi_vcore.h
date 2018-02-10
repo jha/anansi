@@ -12,7 +12,8 @@
 struct anansi_vcore_args {
     struct anansi_context pre_launch_ctx;
     uintptr_t vmxon_phaddr;
-    uintptr_t vmcs_phyaddr;
+    uintptr_t vmcs_phaddr;
+    bool_t hyperjacked;
 };
 
 struct anansi_vcore_stack {

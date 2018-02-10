@@ -4,7 +4,9 @@
 #include "anansi_hwsupp.h"
 #include "anansi_vcore.h"
 #include "anansi_context.h"
-#include "anansi_flags.h"
+#include "anansi_vmx.h"
+
+static struct anansi_vcore *anansi_vcore_tmp = NULL;
 
 bool_t
 anansi_transition_enable_cr4(void)
@@ -33,8 +35,13 @@ anansi_transition_disable_cr4(void)
 bool_t
 anansi_transition_hyperjack(bool_t *success, struct anansi_vcore *vcore)
 {
+    if (anansi_vmx_vmxon(vcore->stack.layout.args.vmxon_phaddr) == FALSE)
+        return FALSE;
+    vcore->stack.layout.args.hyperjacked = TRUE;
 
-    return FALSE;
+
+
+    return TRUE;
 }
 
 void __attribute__((optimize ("O0")))
@@ -50,6 +57,7 @@ anansi_transition_enter(void *arg)
         return;
 
     vcore = anansi_vcore_init();
+    anansi_vcore_tmp = vcore;
     if (vcore == NULL) {
         anansi_transition_disable_cr4();
         return;
@@ -75,14 +83,21 @@ anansi_transition_enter(void *arg)
 }
 
 bool_t
-anansi_transition_unhyperjack(void)
+anansi_transition_unhyperjack(struct anansi_vcore *vcore)
 {
-    return FALSE;
+    /* Disable VMX only if it was turned on */
+    if (vcore->stack.layout.args.hyperjacked == TRUE)
+        anansi_vmx_vmxoff();
+
+    return TRUE;
 }
 
 void
 anansi_transition_exit(void *arg)
 {
+    if (anansi_vcore_tmp != NULL)
+        anansi_transition_unhyperjack(anansi_vcore_tmp);
+
     if (anansi_transition_disable_cr4() == FALSE)
         return;
 }
