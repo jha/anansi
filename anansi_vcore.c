@@ -16,9 +16,7 @@ anansi_vcore_init(void)
         return NULL;
     }
 
-    /* I think we are running as an interrupt, so we need to call kmalloc
-     * with GFP_ATOMIC to prevent it from blocking. Needs more research */
-    vcore = kmalloc(GFP_ATOMIC, sizeof (struct anansi_vcore));
+    vcore = kmalloc(sizeof (struct anansi_vcore), GFP_KERNEL);
     if (vcore == NULL) {
         LOG("Not enough kernel memory to allocate vcore data");
         return NULL;
