@@ -31,6 +31,13 @@ struc context
 ; Instruction pointer
 .rip:   RESQ 1
 
+; Segment registers
+.cs:    RESW 1
+.ds:    RESW 1
+.es:    RESW 1
+.fs:    RESW 1
+.gs:    RESW 1
+
 ; TODO: Add SIMD registers too
 endstruc
 
@@ -64,6 +71,13 @@ anansi_context_capture:
     mov     qword [rdi + context.rip], rax
     pop     rax
 
+    ; Store segment registers
+    mov     word [rdi + context.cs], cs
+    mov     word [rdi + context.ds], ds
+    mov     word [rdi + context.es], es
+    mov     word [rdi + context.fs], fs
+    mov     word [rdi + context.gs], gs
+
     ret
 
 ; context struc as arg0 (passed in rdi)
@@ -87,5 +101,12 @@ anansi_context_restore:
     mov     r13, qword [rdi + context.r13]
     mov     r14, qword [rdi + context.r14]
     mov     r15, qword [rdi + context.r15]
+
+    ; Load segment registers
+    mov     cs, word [rdi + context.cs]
+    mov     ds, word [rdi + context.ds]
+    mov     es, word [rdi + context.es]
+    mov     fs, word [rdi + context.fs]
+    mov     gs, word [rdi + context.gs]
 
     ret

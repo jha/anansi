@@ -44,6 +44,13 @@ struct anansi_context {
     /* Instruction pointer */
     uint64_t rip;
 
+    /* Segment registers */
+    uint16_t cs;
+    uint16_t ds;
+    uint16_t es;
+    uint16_t fs;
+    uint16_t gs;
+
     /* TODO: Add SIMD registers too */
 };
 
