@@ -12,7 +12,12 @@ anansi_vmx_vmxon(uint64_t vmxon_phaddr)
         : [vmxon] "m" (vmxon_phaddr)
     );
 
-    if ((anansi_flags() & X86_FLAG_CF) != 0) {
+    /* 31.5 VMM SETUP & TEARDOWN
+     * Check succesful execution of VMXON by checking if RFLAGS.CF = 0
+     * and RFLAGS.ZF = 0 */
+    if ((anansi_flags() & X86_FLAG_CF) != 0
+        || (anansi_flags() & X86_FLAG_ZF) != 0)
+    {
         LOG("VMXON failure");
         return FALSE;
     }
@@ -20,8 +25,20 @@ anansi_vmx_vmxon(uint64_t vmxon_phaddr)
     return TRUE;
 }
 
-inline void
+bool_t
 anansi_vmx_vmxoff(void)
 {
     asm volatile ("vmxoff");
+
+    /* 31.5 VMM SETUP & TEARDOWN
+     * When executing VMXOFF, verify succesful execution by checking if
+     * RFLAGS.CF = 0 and RFLAGS.ZF = 0 */
+    if ((anansi_flags() & X86_FLAG_CF) != 0
+        || (anansi_flags() & X86_FLAG_ZF) != 0)
+    {
+        LOG("VMXOFF failure");
+        return FALSE;
+    }
+
+    return TRUE;
 }
