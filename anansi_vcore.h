@@ -14,6 +14,7 @@ struct anansi_vcore_args {
     uintptr_t vmxon_phaddr;
     uintptr_t vmcs_phaddr;
     bool_t hyperjacked;
+    bool_t *success_notify;
 };
 
 struct anansi_vcore_stack {

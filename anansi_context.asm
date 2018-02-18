@@ -71,6 +71,11 @@ anansi_context_capture:
     mov     qword [rdi + context.rip], rax
     pop     rax
 
+    ; Store control registers
+    mov     qword [rdi + context.cr0], cr0
+    mov     qword [rdi + context.cr3], cr3
+    mov     qword [rdi + context.cr4], cr4
+
     ; Store segment registers
     mov     word [rdi + context.cs], cs
     mov     word [rdi + context.ds], ds

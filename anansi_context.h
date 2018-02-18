@@ -44,6 +44,11 @@ struct anansi_context {
     /* Instruction pointer */
     uint64_t rip;
 
+    /* Control registers */
+    uint64_t cr0;
+    uint64_t cr3;
+    uint64_t cr4;
+
     /* Segment registers */
     uint16_t cs;
     uint16_t ds;
