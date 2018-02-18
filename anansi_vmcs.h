@@ -1,0 +1,10 @@
+#ifndef ANANSI_VMCS_H
+#define ANANSI_VMCS_H
+
+#define VMCS_LINK_POINTER 0
+
+#define VMCS_MSR_BITMAP 0
+
+#define VMCS_SECONDARY_VM_EXEC_CONTROL 0
+
+#endif /* ANANSI_VMCS_H */
